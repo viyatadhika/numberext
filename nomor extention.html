@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Flipbook Gambar PNG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: #000;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #flipbook {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      perspective: 2000px;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .book {
+      position: relative;
+      width: 90vw;
+      height: 90vh;
+      display: flex;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .page {
+      width: 50%;
+      height: 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      transition: transform 1s ease;
+      backface-visibility: hidden;
+    }
+
+    .left {
+      transform-origin: right;
+      z-index: 1;
+    }
+
+    .right {
+      transform-origin: left;
+      z-index: 2;
+    }
+
+    .flipping .right {
+      animation: flipRight 1s forwards;
+    }
+
+    .flippingBack .right {
+      animation: flipBackRight 1s forwards;
+    }
+
+    @keyframes flipRight {
+      from {
+        transform: rotateY(0deg);
+      }
+      to {
+        transform: rotateY(-180deg);
+      }
+    }
+
+    @keyframes flipBackRight {
+      from {
+        transform: rotateY(-180deg);
+      }
+      to {
+        transform: rotateY(0deg);
+      }
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 16px;
+      border: none;
+      background: #ffffff88;
+      color: #000;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffffffcc;
+    }
+  </style>
+</head>
+<body>
+
+<div id="flipbook">
+  <div class="book" id="book">
+    <div class="page left" id="leftPage"></div>
+    <div class="page right" id="rightPage"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="prevPage()">⬅️ Halaman Sebelumnya</button>
+  <button onclick="nextPage()">Halaman Berikutnya ➡️</button>
+</div>
+
+<audio id="flip-sound" src="https://www.soundjay.com/misc/sounds/page-flip-4.mp3" preload="auto"></audio>
+
+<script>
+  const totalPages = 30;
+  const pages = [];
+  let currentIndex = 0;
+
+  const leftPage = document.getElementById('leftPage');
+  const rightPage = document.getElementById('rightPage');
+  const book = document.getElementById('book');
+  const flipSound = document.getElementById('flip-sound');
+
+  // Generate page pairs
+  for (let i = 1; i <= totalPages; i += 2) {
+    pages.push([`mahkamah_agung_corporate/${i}.png`, `mahkamah_agung_corporate/${i + 1}.png`]);
+  }
+
+  function renderPage(index) {
+    if (index < 0 || index >= pages.length) return;
+    const [leftImg, rightImg] = pages[index];
+    leftPage.style.backgroundImage = `url('${leftImg}')`;
+    rightPage.style.backgroundImage = `url('${rightImg}')`;
+  }
+
+  function nextPage() {
+    if (currentIndex < pages.length - 1) {
+      book.classList.remove('flippingBack');
+      book.classList.add('flipping');
+      setTimeout(() => {
+        currentIndex++;
+        renderPage(currentIndex);
+        book.classList.remove('flipping');
+      }, 1000);
+      flipSound.play();
+    }
+  }
+
+  function prevPage() {
+    if (currentIndex > 0) {
+      book.classList.remove('flipping');
+      book.classList.add('flippingBack');
+      setTimeout(() => {
+        currentIndex--;
+        renderPage(currentIndex);
+        book.classList.remove('flippingBack');
+      }, 1000);
+      flipSound.play();
+    }
+  }
+
+  // Initial render
+  renderPage(currentIndex);
+</script>
+
+</body>
+</html>
